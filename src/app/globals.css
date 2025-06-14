@@ -1,27 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Merienda:wght@300..900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Global Styles */
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-black text-white antialiased transition-colors duration-500;
+}
+:root {
+  --font-merienda: 'Merienda', cursive;
+}
+a {
+  @apply transition duration-300;
+}
+.bg-hero-dark {
+  background-image: url("/bg-waves.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.glow {
+  position: relative;
+  z-index: 1;
+  overflow: visible;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.glow::after {
+  content: '';
+  z-index: -1;
+  
+}
+
+.glow::before {
+  content: "";
+  background: linear-gradient(
+    45deg,
+    #FF0000, #ff7300, #fffb00, #48ff00,
+    #00ffd5, #002bff, #ff00c8, #FF0000
+  );
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  background-size: 600%;
+  z-index: -1;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  transition: opacity 0.3s ease-in-out;
+  animation: animate 20s linear infinite;
+  filter: blur(8px);
+  border-radius: 10px;
+  opacity: 1;
+}
+
+.glow:hover::before {
+  opacity: 1;
+  
+}
+
+@keyframes animate {
+  0% { background-position: 0 0; }
+  50% { background-position: 400% 0; }
+  100% { background-position: 0 0; }
 }
