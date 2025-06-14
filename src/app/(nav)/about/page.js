@@ -24,7 +24,7 @@ export default function AboutPage() {
       <div className="max-w-4xl mx-auto text-center">
         <h1 className="text-4xl sm:text-5xl font-bold mb-4">About <span className='bg-gradient-to-r from-orange-400 via-pink-500 to-red-500 bg-clip-text text-transparent'>PrintEase</span></h1>
         <p className="text-lg text-gray-300">
-          spanPrintEase is a modern printing and xerox hub located in the heart of [Your Area Name], Bengaluru.
+          PrintEase is a modern printing and xerox hub located in the heart of [Your Area Name], Bengaluru.
           We’re focused on fast, convenient, and reliable printing for students and professionals alike —
           all available through a sleek online experience and in-store pickup.
         </p>

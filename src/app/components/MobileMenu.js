@@ -1,7 +1,31 @@
-'use client'
-import Link from 'next/link'
+'use client';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../lib/firebaseconfig';
+import handleLogin from '../lib/handlelogin';
 
 export default function MobileMenu({ isOpen, closeMenu }) {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await handleLogin.logout();
+    closeMenu();
+  };
+
+  const handleLoginClick = async () => {
+    const result = await handleLogin.signInWithGoogle(true);
+    if (!result.success) alert('Login failed');
+    closeMenu();
+  };
+
   return (
     <div
       className={`fixed top-0 right-0 h-full w-1/2 bg-black/90 backdrop-blur-md z-40 transition-transform duration-300 ${
@@ -14,17 +38,40 @@ export default function MobileMenu({ isOpen, closeMenu }) {
         <MobileLink href="/placeorder" onClick={closeMenu}>Place Order</MobileLink>
         <MobileLink href="/pricing" onClick={closeMenu}>Pricing</MobileLink>
 
-        <Link
-          href="/login"
-          onClick={closeMenu}
-          className="inline-block px-6 py-2 rounded-full text-black font-semibold bg-gradient-to-r from-white via-gray-200 to-gray-300 hover:scale-105 hover:shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-300"
+        {user && (
+          <>
+            <MobileLink href="/myorders" onClick={closeMenu}>My Orders</MobileLink>
+            <div className="flex items-center gap-4 mt-4">
+              <img
+                src={user.photoURL || '/default-profile.png'}
+                alt="Profile"
+                className="w-10 h-10 rounded-full object-cover border border-white"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = '/default-profile.png';
+                }}
+              />
+              <button
+                onClick={handleLogout}
+                className="text-sm text-red-400 hover:text-red-300 transition-all"
+              >
+                Logout
+              </button>
+            </div>
+          </>
+        )}
 
-        >
-          Login / Signup
-        </Link>
+        {!user && (
+          <button
+            onClick={handleLoginClick}
+            className="inline-block px-6 py-2 rounded-full text-black font-semibold bg-gradient-to-r from-white via-gray-200 to-gray-300 hover:scale-105 hover:shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-300"
+          >
+            Sign In
+          </button>
+        )}
       </div>
     </div>
-  )
+  );
 }
 
 function MobileLink({ href, onClick, children }) {
@@ -36,5 +83,5 @@ function MobileLink({ href, onClick, children }) {
     >
       {children}
     </Link>
-  )
+  );
 }

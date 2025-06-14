@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import MobileMenu from "./MobileMenu";
 import { usePathname } from "next/navigation";
+import HeaderLoginButton from "./HeaderLoginButton";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,12 +27,7 @@ export default function Header() {
 
         {/* Login/Signup Button (Right) */}
         <div className="hidden md:block">
-          <Link
-            href="/login"
-            className="px-6 py-2 rounded-full text-black font-semibold bg-gradient-to-r from-white via-gray-200 to-gray-300 hover:scale-105 hover:shadow-[0_0_10px_rgba(255,255,255,0.5)] "
-          >
-            Login / Signup
-          </Link>
+          <HeaderLoginButton />
         </div>
 
         {/* Hamburger Button */}
