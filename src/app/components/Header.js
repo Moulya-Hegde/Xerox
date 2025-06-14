@@ -3,23 +3,24 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import MobileMenu from "./MobileMenu";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="w-full px-6 py-4 border-b border-white/10 bg-black relative z-50">
+    <header className="h-content w-full px-6 py-4 border-b border-white/10 bg-black fixed z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
-        <h1 className="text-2xl font-bold tracking-wide text-white">
-          PrintEase
+        <h1 className="text-2xl font-bold tracking-wide text-white cursor-pointer">
+         <Link href="/">QuickPrints</Link>
         </h1>
 
         {/* Desktop Nav Center */}
         <nav className="hidden md:flex gap-10 absolute left-1/2 -translate-x-1/2">
           <NavLink href="/">Home</NavLink>
           <NavLink href="/about">About</NavLink>
-          <NavLink href="/placeorder">Place Order</NavLink>
+          <NavLink href="/placeorder/upload">Place Order</NavLink>
           <NavLink href="/pricing">Pricing</NavLink>
         </nav>
 
@@ -50,14 +51,31 @@ export default function Header() {
 }
 
 function NavLink({ href, children }) {
+  const pathname = usePathname();
+  const isActive = pathname === href;
+
   return (
     <Link
       href={href}
-      className="relative px-4 py-2 text-white transition-transform duration-300 rounded-md group"
+      className={`relative px-4 py-2 text-white transition duration-300 rounded-md group
+        ${isActive ? "bg-white/10 shadow-inner" : ""}
+      `}
     >
       <span className="relative z-10">{children}</span>
-      <span className="absolute inset-0 bg-white/10 rounded-md opacity-0 group-hover:opacity-100 transition duration-300"></span>
-      <span className="absolute top-0 left-1/2 w-1/2 h-[2px] bg-white/60 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition duration-300 transform -translate-x-1/2"></span>
+
+      {/* Hover + Active Background */}
+      <span
+        className={`absolute inset-0 rounded-md transition duration-300 
+        ${isActive ? "opacity-100 bg-white/10" : "opacity-0 group-hover:opacity-100 bg-white/10"}
+      `}
+      ></span>
+
+      {/* Top Glow Line */}
+      <span
+        className={`absolute top-0 left-1/2 w-1/2 h-[2px] bg-white/60 rounded-full blur-sm transition duration-300 transform -translate-x-1/2
+        ${isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
+      `}
+      ></span>
     </Link>
   );
 }

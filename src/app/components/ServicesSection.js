@@ -1,86 +1,92 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import {
-  FaPrint, FaCopy, FaFileAlt, FaBookOpen,
-  FaPaperclip, FaStore,  FaCloudUploadAlt, FaLayerGroup
-} from 'react-icons/fa'
+import React from 'react'
 
 const services = [
   {
-    title: 'Printing',
-    desc: 'High-quality color & B/W prints in various paper sizes.',
-    icon: <FaPrint size={28} />
+    title: "Printing",
+    description: "High-quality document and photo printing on a variety of paper types."
   },
   {
-    title: 'Xerox',
-    desc: 'Quick and reliable document photocopying services.',
-    icon: <FaCopy size={28} />
+    title: "Xerox",
+    description: "Fast and reliable black & white or color photocopying services."
   },
   {
-    title: 'A3 Prints',
-    desc: 'Large format prints with crisp detail and professional finish.',
-    icon: <FaFileAlt size={28} />
+    title: "A3 Prints",
+    description: "Get large format prints for posters, projects, and more."
   },
   {
-    title: 'Soft Binding',
-    desc: 'Perfect for projects, reports & college submissions.',
-    icon: <FaBookOpen size={28} />
+    title: "Soft Bindings",
+    description: "Professional softcover binding for reports, theses, and books."
   },
   {
-    title: 'Spiral Binding',
-    desc: 'Durable spiral binds with a clean, organized look.',
-    icon: <FaPaperclip size={28} />
+    title: "Spiral Bindings",
+    description: "Affordable spiral binding ideal for projects and documents."
   },
   {
-    title: 'In-Store Stationery',
-    desc: 'Pens, files, sheets & other essentials, all under one roof.',
-    icon: <FaStore size={28} />
+    title: "In-store Stationery",
+    description: "Essential pens, papers, files, and more available at your convenience."
   },
   {
-    title: 'Scanning Services',
-    desc: 'Fast document scanning & digital delivery options.',
-    icon: < FaCloudUploadAlt size={28} />
+    title: "Scanning Services",
+    description: "Quick document scanning and digital delivery."
   },
   {
-    title: 'Lamination',
-    desc: 'Protect your documents with high-quality lamination.',
-    icon: <FaLayerGroup size={28} />
+    title: "ID Card Printing",
+    description: "Print professional-looking custom ID cards instantly."
   }
 ]
 
-export default function ServicesSection() {
+const fadeInUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: (i = 1) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.1,
+      duration: 0.6,
+      ease: 'easeOut',
+    },
+  }),
+}
+
+const ServicesSection = () => {
   return (
-    <div className="py-24 mt-24 bg-hero-dark px-6 sm:px-16 bg-[#0e0e0e] text-white relative overflow-hidden">
-      {/* Background Glow */}
-      <div className="absolute -z-10 w-[500px] h-[500px] bg-[#00dfd8]/20 blur-[140px] top-10 left-[-200px]" />
-      <div className="absolute -z-10 w-[400px] h-[400px] bg-[#7928ca]/20 blur-[120px] bottom-0 right-[-150px]" />
-
-      {/* Heading */}
-      <h2 className="text-center text-4xl sm:text-5xl font-bold mb-4 font-merienda">
+    <section className="w-full px-4 sm:px-8 max-w-7xl mx-auto mt-24 mb-15">
+      <motion.h2
+        className="pt-12 text-3xl sm:text-4xl font-bold text-white text-center mb-12"
+        initial={{ opacity: 0, y: -20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+      >
         Our Services
-      </h2>
-      <p className="text-center text-gray-300 max-w-2xl mx-auto mb-12 text-lg">
-        From everyday prints to project-ready bindings — explore everything we offer to keep you organized and on time.
-      </p>
+      </motion.h2>
 
-      {/* Services Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        {services.map((service, idx) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {services.map((service, index) => (
           <motion.div
-            key={idx}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: 'spring', stiffness: 200 }}
-            className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-xl hover:shadow-[0_0_30px_rgba(0,124,240,0.2)] transition duration-300 group"
+            key={index}
+            custom={index}
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="group relative p-6 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-white overflow-hidden transition-transform duration-300 hover:scale-[1.05]"
           >
-            <div className="mb-4 text-[#00DFD8] group-hover:text-[#00b8b2] transition">
-              {service.icon}
+            {/* Glow effect */}
+            <div className="absolute inset-0 z-0 rounded-2xl before:content-[''] before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-cyan-400/30 before:to-blue-600/30 before:blur-xl before:opacity-0 group-hover:before:opacity-100 before:transition-opacity before:duration-500" />
+
+            <div className="relative z-10 ">
+              <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
+              <p className="text-lg text-gray-300 leading-snug">{service.description}</p>
             </div>
-            <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
-            <p className="text-gray-300 text-sm leading-relaxed">{service.desc}</p>
           </motion.div>
         ))}
       </div>
-    </div>
+    </section>
   )
 }
+
+export default ServicesSection

@@ -7,9 +7,7 @@
 body {
   @apply bg-black text-white antialiased transition-colors duration-500;
 }
-:root {
-  --font-merienda: 'Merienda', cursive;
-}
+
 a {
   @apply transition duration-300;
 }

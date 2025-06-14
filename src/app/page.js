@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import ServicesSection from './components/ServicesSection'
+import CTASection from './components/CTASection'
 
 
 const words = ["Upload.", "Pay.", "Print.", "Done."]
@@ -18,7 +19,7 @@ export default function HomePage() {
   }, [])
 
   return (
-    <main className="min-h-screen bg-hero-dark text-white flex flex-col items-center justify-start pt-24 sm:pt-32 px-6 text-center">
+    <main className="min-h-screen bg-hero-dark text-white flex flex-col items-center justify-start pt-24 mt-6 sm:pt-32 px-6 text-center">
 
       {/* Animated Headline */}
       <div className="text-4xl sm:text-5xl md:text-6xl font-bold flex flex-col sm:flex-row flex-wrap justify-center gap-4"
@@ -65,6 +66,7 @@ export default function HomePage() {
         </div>
       </motion.div>
         <ServicesSection />
+        <CTASection />
     </main>
   )
 }
