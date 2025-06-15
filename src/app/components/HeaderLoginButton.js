@@ -1,15 +1,16 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { UserCircle2, LogOut, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { onAuthStateChanged } from 'firebase/auth';
 import {auth} from '../lib/firebaseconfig'; // This should export `auth` from Firebase
 import handleLogin from '../lib/handlelogin'; // Your custom file
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function HeaderLoginButton() {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const router = useRouter();
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser || null);
@@ -27,6 +28,7 @@ export default function HeaderLoginButton() {
   const handleLogout = async () => {
     await handleLogin.logout();
     setMenuOpen(false);
+    router.push('/');
   };
 
   if (!user) {
@@ -80,7 +82,6 @@ export default function HeaderLoginButton() {
             onClick={handleLogout}
             className="flex items-center w-full px-4 py-2 text-sm text-white hover:bg-white/10 transition"
           >
-            <LogOut className="w-4 h-4 mr-2" />
             Logout
           </button>
         </div>

@@ -1,19 +1,11 @@
 'use client';
-import { useEffect, useState } from 'react';
+
 import Link from 'next/link';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../lib/firebaseconfig';
+import { useAuth } from '../context/AuthContext'; // ✅ Use shared auth context
 import handleLogin from '../lib/handlelogin';
 
 export default function MobileMenu({ isOpen, closeMenu }) {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-    });
-    return () => unsubscribe();
-  }, []);
+  const { user } = useAuth(); // ✅ Use global auth state
 
   const handleLogout = async () => {
     await handleLogin.logout();
@@ -35,7 +27,7 @@ export default function MobileMenu({ isOpen, closeMenu }) {
       <div className="p-6 flex flex-col gap-6 mt-20 text-white text-lg">
         <MobileLink href="/" onClick={closeMenu}>Home</MobileLink>
         <MobileLink href="/about" onClick={closeMenu}>About</MobileLink>
-        <MobileLink href="/placeorder" onClick={closeMenu}>Place Order</MobileLink>
+        {user && <MobileLink href="/placeorder/upload" onClick={closeMenu}>Place Order</MobileLink>}
         <MobileLink href="/pricing" onClick={closeMenu}>Pricing</MobileLink>
 
         {user && (
