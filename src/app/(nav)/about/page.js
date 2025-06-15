@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
-
 const reviews = [
   { name: "Riya S.", rating: 5, review: "Quick and reliable service! Perfect for college students." },
   { name: "Arjun P.", rating: 4, review: "Affordable prices and quality prints. Will visit again!" },
@@ -16,6 +15,7 @@ const images = [
 ];
 
 export default function AboutPage() {
+  
   const [currentImage, setCurrentImage] = useState(0);
 
   return (
