@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { genUploader } from "uploadthing/client";
 import { CheckCircle } from "lucide-react";
@@ -9,23 +9,17 @@ import UploadDropzone from "./UploadDropzone";
 import PDFPreviewCard from "./PDFPreviewCard";
 import getPdfPageCount from "./utils/getPdfPageCount";
 import validatePageRanges from "./utils/validatePageRanges";
+import { useOrder } from "@/app/context/OrderContext";
 
-const {uploadFiles} = genUploader();
+const { uploadFiles } = genUploader();
 
 export default function UploadPage() {
   const router = useRouter();
+  const { addFiles, clearOrder } = useOrder();
+
   const [fileList, setFileList] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
-
-  useEffect(() => {
-    const stored = sessionStorage.getItem("pendingUploads");
-    if (stored) setFileList(JSON.parse(stored));
-  }, []);
-
-  useEffect(() => {
-    sessionStorage.setItem("pendingUploads", JSON.stringify(fileList));
-  }, [fileList]);
 
   const onDrop = useCallback(async (acceptedFiles) => {
     if (acceptedFiles.length === 0) return;
@@ -36,11 +30,12 @@ export default function UploadPage() {
       file,
       pageCount,
       colorMode: "none",
-      colorPages: "",
+      colorPages: "none",
       bwMode: "none",
-      bwPages: "",
+      bwPages: "none",
       printStyle: "single",
       copies: 1,
+      binding: "none",
     };
     setFileList((prev) => [...prev, newEntry]);
   }, []);
@@ -61,16 +56,30 @@ export default function UploadPage() {
     if (fileList.length === 0) return alert("No files to upload.");
 
     for (let entry of fileList) {
-      if (
-        (entry.colorMode === "custom" &&
-          !validatePageRanges(entry.colorPages, entry.pageCount)) ||
-        (entry.bwMode === "custom" &&
-          !validatePageRanges(entry.bwPages, entry.pageCount)) ||
-        (entry.colorMode === "all" && entry.bwMode === "all") ||
-        (entry.colorMode === "none" && entry.bwMode === "none") ||
-        entry.copies < 1
-      ) {
-        alert(`Please check print options for "${entry.file.name}"`);
+      const { file, colorMode, colorPages, bwMode, bwPages, pageCount, copies } = entry;
+
+      if (colorMode === "custom" && !validatePageRanges(colorPages.trim(), pageCount)) {
+        alert(`Invalid custom Color Pages in "${file.name}". Please use format like 1,3-5 and stay within ${pageCount} pages.`);
+        return;
+      }
+
+      if (bwMode === "custom" && !validatePageRanges(bwPages.trim(), pageCount)) {
+        alert(`Invalid custom B&W Pages in "${file.name}". Please use format like 2,4-6 and stay within ${pageCount} pages.`);
+        return;
+      }
+
+      if (colorMode === "all" && bwMode === "all") {
+        alert(`Both Color and B&W can't be set to "All" in "${file.name}". Choose one or split pages.`);
+        return;
+      }
+
+      if (colorMode === "none" && bwMode === "none") {
+        alert(`You must select either Color or B&W pages to print in "${file.name}".`);
+        return;
+      }
+
+      if (copies < 1) {
+        alert(`Please enter at least 1 copy for "${file.name}".`);
         return;
       }
     }
@@ -85,24 +94,35 @@ export default function UploadPage() {
         )
       );
 
-      const allOrders = fileList.map((entry, idx) => ({
-        fileName: entry.file.name,
-        fileSize: entry.file.size,
-        fileUrl: results[idx]?.[0]?.ufsUrl,
-        pageCount: entry.pageCount,
+      const uploadedFiles = fileList.map((entry, idx) => ({
+        file: {
+          name: entry.file.name,
+          size: entry.file.size,
+          type: entry.file.type,
+        },
+        uploadData: {
+          url: results[idx]?.[0]?.url || results[idx]?.[0]?.ufsUrl || null,
+          key: results[idx]?.[0]?.key || null,
+          filename: results[idx]?.[0]?.name || entry.file.name,
+        },
         printOptions: {
           colorPages: entry.colorPages,
           bwPages: entry.bwPages,
           printStyle: entry.printStyle,
           copies: entry.copies,
+          binding: entry.binding,
         },
       }));
 
-      sessionStorage.removeItem("pendingUploads");
-      sessionStorage.setItem("orderSummary", JSON.stringify(allOrders));
-      setUploaded(true);
-      setFileList([]);
-      router.push("/placeorder/summary");
+      clearOrder(); // optional: reset before adding new
+      addFiles(uploadedFiles);
+
+      // 🔄 Add short delay to ensure context update is persisted before navigation
+      setTimeout(() => {
+        setUploaded(true);
+        setFileList([]);
+        router.push("/placeorder/summary");
+      }, 100); // 100ms is enough
     } catch (err) {
       console.error("Upload failed:", err);
       alert("Upload failed. Please try again.");
@@ -127,41 +147,40 @@ export default function UploadPage() {
             />
           ))}
           <button
-  onClick={handleSubmit}
-  disabled={uploading || fileList.length === 0}
-  className={`mt-6 w-full py-3 rounded font-semibold flex justify-center items-center gap-2 ${
-    uploading
-      ? "bg-gray-400 text-white cursor-not-allowed"
-      : "bg-teal-600 hover:bg-teal-700 text-white"
-  }`}
->
-  {uploading ? (
-    <>
-      <svg
-        className="animate-spin h-5 w-5 text-white"
-        viewBox="0 0 24 24"
-      >
-        <circle
-          className="opacity-25"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="4"
-        ></circle>
-        <path
-          className="opacity-75"
-          fill="currentColor"
-          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-        ></path>
-      </svg>
-      <span className="ml-2">Uploading...</span>
-    </>
-  ) : (
-    `Upload ${fileList.length} file${fileList.length > 1 ? "s" : ""}`
-  )}
-</button>
-
+            onClick={handleSubmit}
+            disabled={uploading || fileList.length === 0}
+            className={`mt-6 w-full py-3 rounded font-semibold flex justify-center items-center gap-2 ${
+              uploading
+                ? "bg-gray-400 text-white cursor-not-allowed"
+                : "bg-teal-600 hover:bg-teal-700 text-white"
+            }`}
+          >
+            {uploading ? (
+              <>
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  ></path>
+                </svg>
+                <span className="ml-2">Uploading...</span>
+              </>
+            ) : (
+              `Upload ${fileList.length} file${fileList.length > 1 ? "s" : ""}`
+            )}
+          </button>
         </>
       ) : (
         <div className="mt-6 p-6 bg-green-900 text-center rounded-lg">
@@ -172,4 +191,3 @@ export default function UploadPage() {
     </main>
   );
 }
-
