@@ -2,9 +2,9 @@ import { Trash2 } from "lucide-react";
 
 export default function PDFPreviewCard({ entry, onChange, onDelete }) {
   return (
-    <div className="mb-4 p-4 bg-white dark:bg-gray-800 rounded shadow">
+    <div className="mb-4 p-4 bg-gray-800 rounded shadow">
       <div className="flex justify-between items-center mb-2">
-        <span className="text-sm text-black dark:text-white">
+        <span className="text-sm text-white">
           {entry.file.name} – {(entry.file.size / 1024).toFixed(1)} KB
         </span>
         <button
@@ -15,7 +15,7 @@ export default function PDFPreviewCard({ entry, onChange, onDelete }) {
         </button>
       </div>
 
-      <div className="mb-2 text-sm text-gray-800 dark:text-gray-200">
+      <div className="mb-2 text-sm text-gray-200">
         Total Pages: <span className="font-semibold">{entry.pageCount}</span>
       </div>
 
@@ -23,7 +23,7 @@ export default function PDFPreviewCard({ entry, onChange, onDelete }) {
         <div>
           <label>Color Pages</label>
           <select
-            className="w-full p-2 rounded bg-gray-100 dark:bg-gray-700"
+            className="w-full p-2 rounded bg-gray-700"
             value={entry.colorMode}
             onChange={(e) => onChange(entry.id, "colorMode", e.target.value)}
           >
@@ -34,7 +34,7 @@ export default function PDFPreviewCard({ entry, onChange, onDelete }) {
           </select>
           {entry.colorMode === "custom" && (
             <input
-              className="w-full mt-1 p-2 rounded bg-gray-50 dark:bg-gray-700"
+              className="w-full mt-1 p-2 rounded bg-gray-700"
               value={entry.colorPages}
               onChange={(e) => onChange(entry.id, "colorPages", e.target.value)}
               placeholder="e.g. 1,3-5"
@@ -45,7 +45,7 @@ export default function PDFPreviewCard({ entry, onChange, onDelete }) {
         <div>
           <label>B&W Pages</label>
           <select
-            className="w-full p-2 rounded bg-gray-100 dark:bg-gray-700"
+            className="w-full p-2 rounded bg-gray-700"
             value={entry.bwMode}
             onChange={(e) => onChange(entry.id, "bwMode", e.target.value)}
             disabled={entry.colorMode === "all"}
@@ -57,7 +57,7 @@ export default function PDFPreviewCard({ entry, onChange, onDelete }) {
           </select>
           {entry.bwMode === "custom" && (
             <input
-              className="w-full mt-1 p-2 rounded bg-gray-50 dark:bg-gray-700"
+              className="w-full mt-1 p-2 rounded bg-gray-700"
               value={entry.bwPages}
               onChange={(e) => onChange(entry.id, "bwPages", e.target.value)}
               placeholder="e.g. 2,4-6"
@@ -68,7 +68,7 @@ export default function PDFPreviewCard({ entry, onChange, onDelete }) {
         <div>
           <label>Printing Style</label>
           <select
-            className="w-full p-2 rounded bg-gray-100 dark:bg-gray-700"
+            className="w-full p-2 rounded bg-gray-700"
             value={entry.printStyle}
             onChange={(e) => onChange(entry.id, "printStyle", e.target.value)}
           >
@@ -82,7 +82,7 @@ export default function PDFPreviewCard({ entry, onChange, onDelete }) {
           <input
             type="number"
             min="1"
-            className="w-full p-2 rounded bg-gray-100 dark:bg-gray-700"
+            className="w-full p-2 rounded bg-gray-700"
             value={entry.copies}
             onChange={(e) =>
               onChange(entry.id, "copies", parseInt(e.target.value))

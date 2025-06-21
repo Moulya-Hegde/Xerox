@@ -15,7 +15,7 @@ export default function UploadDropzone({ onDrop, disabled }) {
       className={`border-2 border-dashed rounded-md p-8 mb-4 text-center cursor-pointer transition ${
         isDragActive
           ? "bg-teal-100 text-black border-teal-500"
-          : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+          : "bg-gray-800  border-gray-600 text-white"
       }`}
     >
       <input {...getInputProps()} />
