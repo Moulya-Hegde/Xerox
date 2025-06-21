@@ -10,6 +10,9 @@ import { useRouter } from 'next/navigation';
 export default function HeaderLoginButton() {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const imageSrc = user?.photoURL && !hasError ? user.photoURL : "/defaultImage.png";
   const router = useRouter();
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -48,23 +51,24 @@ export default function HeaderLoginButton() {
         onClick={() => setMenuOpen(!menuOpen)}
         className="w-10 h-10 rounded-full overflow-hidden border border-white/20 hover:ring-2 hover:ring-white/40 transition-all"
       >
-        {user.photoURL ? (
-  <img
-    src={user.photoURL}
-    alt="Profile"
-    className="w-full h-full object-cover rounded-full"
-    onError={(e) => {
-      e.target.onerror = null;
-      e.target.src = '/default-profile.png'; // 👈 fallback image
-    }}
-  />
-) : (
-  <img
-    src="/defaultImage.png"
-    alt="Default Profile"
-    className="w-full h-full object-cover rounded-full"
-  />
-)}
+       <img
+        src={imageSrc}
+        alt="Profile"
+        className="w-full h-full object-cover rounded-full"
+        onLoad={() => setIsLoaded(true)}
+        onError={() => {
+          setHasError(true);
+          setIsLoaded(true);
+        }}
+        style={{ opacity: isLoaded ? 1 : 0, transition: 'opacity 0.3s ease-in-out' }}
+      />
+      {!isLoaded && (
+        <img
+          src="/defaultImage.png"
+          alt="Loading fallback"
+          className="w-full h-full object-cover rounded-full absolute top-0 left-0"
+        />
+      )}
 
       </button>
 

@@ -35,12 +35,12 @@ export default function MobileMenu({ isOpen, closeMenu }) {
             <MobileLink href="/myorders" onClick={closeMenu}>My Orders</MobileLink>
             <div className="flex items-center gap-4 mt-4">
               <img
-                src={user.photoURL || '/default-profile.png'}
+                src={user.photoURL || '/defaultImage.png'}
                 alt="Profile"
                 className="w-10 h-10 rounded-full object-cover border border-white"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = '/default-profile.png';
+                  e.target.src = '/defaultImage.png';
                 }}
               />
               <button

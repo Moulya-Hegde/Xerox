@@ -2,8 +2,25 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-
+import { useAuth } from '../context/AuthContext'
+import handleLogin from '../lib/handlelogin'
+import { useRouter } from 'next/navigation'
 const CTASection = () => {
+  const { user, loading } = useAuth()
+  const router = useRouter()
+  const handlePlaceOrder = async () => {
+    if (loading) return // Wait for auth status
+    if (user) {
+      router.push('/placeorder')
+    } else {
+      const result = await handleLogin.signInWithGoogle(true) // rememberMe = true
+      if (result.success) {
+        router.push('/placeorder')
+      } else {
+        alert('Login failed: ' + result.error.message)
+      }
+    }
+  }
   return (
     <section className="w-full px-6 sm:px-10 py-20 text-white">
       {/* CTA Container */}
@@ -22,15 +39,16 @@ const CTASection = () => {
           Upload your files from anywhere. We'll print and notify you when it's ready — no standing in line.
         </p>
 
-        <Link href="/place-order">
+        
           <motion.button
             whileHover={{ scale: 1.05, backgroundColor: '#ffffff10' }}
             whileTap={{ scale: 0.98 }}
             className="border border-white text-white px-7 py-3 rounded-full font-medium transition duration-300 hover:bg-white/10"
+            onClick={handlePlaceOrder}
           >
             Place Your Order
           </motion.button>
-        </Link>
+        
       </motion.div>
     </section>
   )
