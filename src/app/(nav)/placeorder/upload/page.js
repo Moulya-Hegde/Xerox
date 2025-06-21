@@ -36,11 +36,12 @@ export default function UploadPage() {
       file,
       pageCount,
       colorMode: "none",
-      colorPages: "",
+      colorPages: "none",
       bwMode: "none",
-      bwPages: "",
+      bwPages: "none",
       printStyle: "single",
       copies: 1,
+      binding: "none",
     };
     setFileList((prev) => [...prev, newEntry]);
   }, []);
@@ -61,19 +62,39 @@ export default function UploadPage() {
     if (fileList.length === 0) return alert("No files to upload.");
 
     for (let entry of fileList) {
-      if (
-        (entry.colorMode === "custom" &&
-          !validatePageRanges(entry.colorPages, entry.pageCount)) ||
-        (entry.bwMode === "custom" &&
-          !validatePageRanges(entry.bwPages, entry.pageCount)) ||
-        (entry.colorMode === "all" && entry.bwMode === "all") ||
-        (entry.colorMode === "none" && entry.bwMode === "none") ||
-        entry.copies < 1
-      ) {
-        alert(`Please check print options for "${entry.file.name}"`);
+      const { file, colorMode, colorPages, bwMode, bwPages, pageCount, copies } = entry;
+    
+      // Validate custom color pages
+      if (colorMode === "custom" && !validatePageRanges(colorPages.trim(), pageCount)) {
+        alert(`Invalid custom Color Pages in "${file.name}". Please use format like 1,3-5 and stay within ${pageCount} pages.`);
+        return;
+      }
+    
+      // Validate custom B&W pages
+      if (bwMode === "custom" && !validatePageRanges(bwPages.trim(), pageCount)) {
+        alert(`Invalid custom B&W Pages in "${file.name}". Please use format like 2,4-6 and stay within ${pageCount} pages.`);
+        return;
+      }
+    
+      // Prevent both color and B&W from being 'all'
+      if (colorMode === "all" && bwMode === "all") {
+        alert(`Both Color and B&W can't be set to "All" in "${file.name}". Choose one or split pages.`);
+        return;
+      }
+    
+      // Prevent both from being 'none'
+      if (colorMode === "none" && bwMode === "none") {
+        alert(`You must select either Color or B&W pages to print in "${file.name}".`);
+        return;
+      }
+    
+      // Validate copies
+      if (copies < 1) {
+        alert(`Please enter at least 1 copy for "${file.name}".`);
         return;
       }
     }
+    
 
     setUploading(true);
     try {
@@ -95,6 +116,7 @@ export default function UploadPage() {
           bwPages: entry.bwPages,
           printStyle: entry.printStyle,
           copies: entry.copies,
+          binding: entry.binding,
         },
       }));
 

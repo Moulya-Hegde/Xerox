@@ -25,7 +25,13 @@ export default function PDFPreviewCard({ entry, onChange, onDelete }) {
           <select
             className="w-full p-2 rounded bg-gray-700"
             value={entry.colorMode}
-            onChange={(e) => onChange(entry.id, "colorMode", e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              onChange(entry.id, "colorMode", value);
+              if (value !== "custom") {
+                onChange(entry.id, "colorPages", value);
+              }
+            }}
           >
             <option value="none">None</option>
             <option value="all">All</option>
@@ -47,7 +53,13 @@ export default function PDFPreviewCard({ entry, onChange, onDelete }) {
           <select
             className="w-full p-2 rounded bg-gray-700"
             value={entry.bwMode}
-            onChange={(e) => onChange(entry.id, "bwMode", e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              onChange(entry.id, "bwMode", value);
+              if (value !== "custom") {
+                onChange(entry.id, "bwPages", value);
+              }
+            }}
             disabled={entry.colorMode === "all"}
           >
             <option value="none">None</option>
@@ -88,6 +100,19 @@ export default function PDFPreviewCard({ entry, onChange, onDelete }) {
               onChange(entry.id, "copies", parseInt(e.target.value))
             }
           />
+        </div>
+
+        <div>
+          <label>Binding</label>
+          <select
+            className="w-full p-2 rounded bg-gray-700"
+            value={entry.binding}
+            onChange={(e) => onChange(entry.id, "binding", e.target.value)}
+          >
+            <option value="none">None</option>
+            <option value="spiral">Spiral</option>
+            <option value="soft">Soft Binding</option>
+          </select>
         </div>
       </div>
     </div>

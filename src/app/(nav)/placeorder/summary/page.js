@@ -21,6 +21,7 @@ export default function SummaryPage() {
           <p>Copies: {order.printOptions.copies}</p>
           <p>Color Pages: {order.printOptions.colorPages || order.printOptions.colorMode}</p>
           <p>B&W Pages: {order.printOptions.bwPages || order.printOptions.bwMode}</p>
+          <p>Binding: {order.printOptions.binding}</p>
         </div>
       ))}
     </main>
