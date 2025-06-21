@@ -11,9 +11,9 @@ export const config = {
 
 export async function POST(request) {
   await connectDB();
-
+	const data = await request.json();
   try {
-    const data = await request.json();
+    
     
     // Validate required fields
     if (!data.user || !data.files?.length || !data.customerName || !data.email) {
@@ -103,6 +103,21 @@ export async function DELETE(request) {
     console.error("Order deletion error:", err);
     return NextResponse.json(
       { error: "Deletion failed", details: err.message },
+      { status: 500 }
+    );
+  }
+}
+
+
+export async function GET() {
+  await connectDB();
+
+  try {
+    const orders = await Order.find().sort({ createdAt: -1 });
+    return NextResponse.json({ success: true, orders });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: "Failed to fetch orders" },
       { status: 500 }
     );
   }
