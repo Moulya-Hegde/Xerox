@@ -18,7 +18,7 @@ export default function PlaceOrderLayout({ children }) {
   return (
     <div className="min-h-screen w-full bg-black text-white mt-14">
       {/* Step Bar */}
-      <div className="w-full px-6 pt-6">
+      <div className="w-full px-6 pt-8">
         <div className="relative flex justify-between items-center max-w-5xl mx-auto">
           {/* Line Behind Dots */}
           <div className="absolute top-[28px] left-0 w-full h-[2px] bg-white/10 z-0" />
