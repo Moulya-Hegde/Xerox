@@ -3,11 +3,6 @@ import { connectDB } from "@/lib/db";
 import Order from "@/models/orderModel";
 import { UTApi } from "uploadthing/server";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 
 export async function POST(request) {
   await connectDB();
