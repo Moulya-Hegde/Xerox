@@ -19,11 +19,40 @@ export default function HeaderLoginButton() {
     return () => unsubscribe();
   }, []);
 
-  const handleGoogleLogin = async () => {
-    const result = await handleLogin.signInWithGoogle(true); // true = rememberMe
-    if (!result.success) alert('Login failed: ' + result.error.message);
-    
-  };
+
+	const handleGoogleLogin = async () => {
+	  const result = await handleLogin.signInWithGoogle(true); // true = rememberMe
+
+	  if (!result.success) {
+		alert('Login failed: ' + result.error.message);
+		return;
+	  }
+
+	  const firebaseUser = result.user;
+
+	  try {
+		const res = await fetch("/api/users", {
+		  method: "POST",
+		  headers: {
+			"Content-Type": "application/json",
+		  },
+		  body: JSON.stringify({
+			uid: firebaseUser.uid,
+			name: firebaseUser.displayName,
+			email: firebaseUser.email,
+			phone: firebaseUser.phoneNumber, // may be null
+		  }),
+		});
+
+		const data = await res.json();
+		if (!res.ok) {
+		  console.error("Backend user sync failed:", data.error);
+		}
+	  } catch (err) {
+		console.error("Failed to send user to backend:", err);
+	  }
+	};
+
 
   const handleLogout = async () => {
     await handleLogin.logout();
