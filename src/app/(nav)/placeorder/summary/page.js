@@ -49,17 +49,23 @@ export default function SummaryPage() {
         customerName: order.customerInfo.name,
         email: order.customerInfo.email,
         files: files.map((entry) => ({
-          url: entry.uploadData?.url,
-          key: entry.uploadData?.key,
-          filename: entry.file?.name,
-          pages:
-            entry.printOptions?.colorPages !== "none"
-              ? entry.printOptions.colorPages
-              : entry.printOptions.bwPages,
-          color:
-            entry.printOptions?.colorPages !== "none" ? "color" : "bw",
-          copies: entry.printOptions?.copies || 1,
-          paperSize: "A4",
+          file: {
+            name: entry.file?.name,
+            size: entry.file?.size,
+            type: entry.file?.type,
+          },
+          uploadData: {
+            url: entry.uploadData?.url,
+            key: entry.uploadData?.key,
+            filename: entry.uploadData?.filename || entry.file?.name,
+          },
+          printOptions: {
+            colorPages: entry.printOptions?.colorPages || "none",
+            bwPages: entry.printOptions?.bwPages || "none",
+            printStyle: entry.printOptions?.printStyle || "single",
+            copies: entry.printOptions?.copies || 1,
+            binding: entry.printOptions?.binding || "none",
+          },
         })),
         payment: {
           mode: order.payment?.mode || null,
@@ -83,6 +89,7 @@ export default function SummaryPage() {
         const orderData = await orderRes.json();
         if (orderData.success) {
           setBackendOrder(orderData.order);
+          console.log("orderData:", orderData);
         }
 
         setTimeout(() => {
@@ -117,22 +124,31 @@ export default function SummaryPage() {
         <p className="text-gray-400">No files uploaded yet.</p>
       ) : (
         <>
-          {orderFiles.map((entry, idx) => (
-            <div key={idx} className="mb-4 p-4 rounded bg-gray-800">
-              <h2 className="text-lg font-semibold">
-                {entry.filename || entry.file?.name || "Untitled"}
-              </h2>
-              <p>Copies: {entry.copies}</p>
-              <p>Pages: {entry.pages}</p>
-              <p>Color: {entry.color}</p>
-              <p>Paper: {entry.paperSize || "A4"}</p>
-              <p className="break-all text-sm text-teal-300">
-                URL: {entry.url || entry.uploadData?.url || "Not uploaded"}
-              </p>
-            </div>
-          ))}
+          {orderFiles.map((entry, idx) => {
+            const file = entry.file || {};
+            const upload = entry.uploadData || {};
+            const opts = entry.printOptions || {};
 
-          {/* Hide confirm button if order already placed */}
+            return (
+              <div key={idx} className="mb-4 p-4 rounded bg-gray-800">
+                <h2 className="text-lg font-semibold">
+                  {upload.filename || file.name || "Untitled"}
+                </h2>
+                <p>Size: {(file.size / 1024).toFixed(2)} KB</p>
+                <p>Type: {file.type}</p>
+                <p>Copies: {opts.copies}</p>
+                <p>Color Pages: {opts.colorPages}</p>
+                <p>B&W Pages: {opts.bwPages}</p>
+                <p>Print Style: {opts.printStyle}</p>
+                <p>Binding: {opts.binding}</p>
+                <p>Paper: A4</p>
+                <p className="break-all text-sm text-teal-300">
+                  URL: {upload.url || "Not uploaded"}
+                </p>
+              </div>
+            );
+          })}
+
           {!orderId && (
             <button
               onClick={handleConfirmOrder}
