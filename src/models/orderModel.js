@@ -1,26 +1,34 @@
 import mongoose from "mongoose";
 
-// File reference (Uploadthing metadata only - no Buffer)
+// File reference 
 const fileSchema = new mongoose.Schema({
-  url: { type: String, required: true },      // Uploadthing CDN URL
-  key: { type: String, required: true },     // For file deletion
-  filename: { type: String, required: true }, // Original name
-  pages: { type: String, required: true },    // e.g., "1-10" or "1,3,5"
-  color: { 
-    type: String, 
-    enum: ["color", "bw"], 
-    required: true 
+  file: {
+    name: { type: String, required: true },
+    size: { type: Number, required: true }, // in bytes
+    type: { type: String, required: true }, // e.g., "application/pdf"
   },
-  copies: { 
-    type: Number, 
-    required: true, 
-    min: 1 
+  uploadData: {
+    url: { type: String, required: true },     // UploadThing CDN URL
+    key: { type: String, required: true },     // UploadThing file key
+    filename: { type: String, required: true } // Original filename again (for redundancy)
   },
-  paperSize: { 
-    type: String, 
-    required: true 
-  },
+  printOptions: {
+    colorPages: { type: String, required: true }, // e.g., "1,2,3" or "none"
+    bwPages: { type: String, required: true },    // e.g., "all" or "none"
+    printStyle: {
+      type: String,
+      enum: ["single", "double"],
+      required: true,
+    },
+    copies: { type: Number, required: true, min: 1 },
+    binding: {
+      type: String,
+      enum: ["none", "spiral", "staple", "clip"], // adjust as needed
+      required: true,
+    },
+  }
 }, { _id: false });
+
 
 // Payment info (simplified)
 const paymentSchema = new mongoose.Schema({

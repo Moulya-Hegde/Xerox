@@ -3,14 +3,12 @@ import { connectDB } from "@/lib/db";
 import Order from "@/models/orderModel";
 import { UTApi } from "uploadthing/server";
 
-
 export async function POST(request) {
   await connectDB();
-	const data = await request.json();
+  const data = await request.json();
+
   try {
-    
-    
-    // Validate required fields
+    // Validate top-level required fields
     if (!data.user || !data.files?.length || !data.customerName || !data.email) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -18,19 +16,29 @@ export async function POST(request) {
       );
     }
 
-    // Create order with 7-day auto-expiry
+    // Create new Order using nested schema structure
     const newOrder = await Order.create({
       user: data.user,
       customerName: data.customerName,
       email: data.email,
       files: data.files.map(file => ({
-        url: file.url,
-        key: file.key,
-        filename: file.filename,
-        pages: file.pages,
-        color: file.color,
-        copies: file.copies || 1,
-        paperSize: file.paperSize || "A4"
+        file: {
+          name: file.file?.name,
+          size: file.file?.size,
+          type: file.file?.type
+        },
+        uploadData: {
+          url: file.uploadData?.url,
+          key: file.uploadData?.key,
+          filename: file.uploadData?.filename || file.file?.name
+        },
+        printOptions: {
+          colorPages: file.printOptions?.colorPages || "none",
+          bwPages: file.printOptions?.bwPages || "none",
+          printStyle: file.printOptions?.printStyle || "single",
+          copies: file.printOptions?.copies || 1,
+          binding: file.printOptions?.binding || "none"
+        }
       })),
       payment: {
         mode: data.payment?.mode || null,
@@ -47,31 +55,33 @@ export async function POST(request) {
 
   } catch (err) {
     console.error("Order creation error:", err);
-    
-    // Auto-delete uploaded files if order creation failed
-    if (data?.files) {
+
+    // Cleanup: Attempt to delete uploaded files if creation failed
+    if (data?.files?.length) {
       const utapi = new UTApi();
       await Promise.all(
-        data.files.map(file => 
-          utapi.deleteFiles(file.key).catch(e => console.error("File cleanup failed:", e))
-        )
+        data.files.map(file => {
+          const key = file.uploadData?.key;
+          return key ? utapi.deleteFiles(key).catch(e => console.error("Cleanup failed:", e)) : null;
+        })
       );
     }
 
     return NextResponse.json(
-      { 
+      {
         error: "Order creation failed",
-        details: err.message 
+        details: err.message
       },
       { status: 500 }
     );
   }
 }
 
+
 export async function DELETE(request) {
   await connectDB();
   const { searchParams } = new URL(request.url);
-  const orderId = searchParams.get('id');
+  const orderId = searchParams.get("id");
 
   if (!orderId) {
     return NextResponse.json(
@@ -91,7 +101,7 @@ export async function DELETE(request) {
 
     return NextResponse.json({
       success: true,
-      message: "Order deleted"
+      message: "Order deleted",
     });
 
   } catch (err) {
@@ -102,7 +112,6 @@ export async function DELETE(request) {
     );
   }
 }
-
 
 export async function GET() {
   await connectDB();
